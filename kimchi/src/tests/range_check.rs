@@ -3,10 +3,7 @@ use crate::{
         constraints::ConstraintSystem,
         gate::{CircuitGate, CircuitGateError, GateType},
         polynomial::COLUMNS,
-        polynomials::{
-            generic::GenericGateSpec,
-            range_check::{self},
-        },
+        polynomials::{generic::GenericGateSpec, range_check},
         wires::Wire,
     },
     dummy_sponge::{DummyFqSponge, DummyFrSponge},
@@ -17,6 +14,7 @@ use crate::{
 use ark_ec::AffineCurve;
 use ark_ff::{Field, One, Zero};
 use ark_poly::EvaluationDomain;
+use ark_serialize::Write;
 use mina_curves::pasta::{Fp, Pallas, Vesta, VestaParameters};
 use num_bigint::{BigUint, RandBigInt};
 use o1_utils::{
@@ -28,8 +26,8 @@ use o1_utils::{
 };
 use rand::{rngs::StdRng, SeedableRng};
 
-use std::array;
 use std::sync::Arc;
+use std::{array, fs::File};
 
 use crate::{prover_index::ProverIndex, verifier::verify};
 use groupmap::GroupMap;
@@ -1256,6 +1254,14 @@ fn verify_range_check_valid_proof1_with_dummy_sponge() {
         &prover_index,
     )
     .expect("failed to generate proof");
+
+    let srs_json = serde_json::to_string(&prover_index.srs.as_ref()).unwrap();
+    let mut srs_file = File::create("srs.json").unwrap();
+    srs_file.write_all(&srs_json.as_bytes()).unwrap();
+
+    let proof_json = serde_json::to_string(&proof).unwrap();
+    let mut proof_file = File::create("proof.json").unwrap();
+    proof_file.write_all(&proof_json.as_bytes()).unwrap();
 
     // Get the verifier index
     let verifier_index = prover_index.verifier_index();

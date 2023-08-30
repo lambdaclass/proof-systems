@@ -172,9 +172,11 @@ pub mod testing {
 
         let mut srs = if cs.domain.d1.log_size_of_group <= precomputed_srs::SERIALIZED_SRS_SIZE {
             // TODO: we should trim it if it's smaller
+            println!("PRECOMPUTED SRS");
             precomputed_srs::get_srs()
         } else {
             // TODO: we should resume the SRS generation starting from the serialized one
+            println!("GENERATED SRS");
             SRS::<G>::create(cs.domain.d1.size())
         };
 
