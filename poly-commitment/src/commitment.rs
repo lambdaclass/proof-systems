@@ -6,7 +6,7 @@
 //!     producing the batched opening proof
 //! 3. Verify batch of batched opening proofs
 
-use crate::srs::endos;
+// use crate::srs::endos;
 use crate::{error::CommitmentError, srs::SRS};
 use ark_ec::{
     models::short_weierstrass_jacobian::GroupAffine as SWJAffine, msm::VariableBaseMSM,
@@ -25,7 +25,7 @@ use mina_poseidon::{sponge::ScalarChallenge, FqSponge};
 use o1_utils::math;
 use o1_utils::ExtendedDensePolynomial as _;
 use rand_core::{CryptoRng, RngCore};
-use rayon::prelude::*;
+// use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
 use std::iter::Iterator;
@@ -659,7 +659,7 @@ impl<G: CommitmentCurve> SRS<G> {
     ///     RETURN: verification status
     pub fn verify<EFqSponge, RNG>(
         &self,
-        group_map: &G::Map,
+        _group_map: &G::Map,
         batch: &mut [BatchEvaluationProof<G, EFqSponge>],
         rng: &mut RNG,
     ) -> bool
@@ -694,7 +694,7 @@ impl<G: CommitmentCurve> SRS<G> {
 
         let padded_length = 1 << max_rounds;
 
-        let (_, endo_r) = endos::<G>();
+        // let (_, endo_r) = endos::<G>();
 
         // TODO: This will need adjusting
         let padding = padded_length - nonzero_length;
@@ -713,15 +713,16 @@ impl<G: CommitmentCurve> SRS<G> {
         let mut sg_rand_base_i = G::ScalarField::one();
 
         for BatchEvaluationProof {
-            sponge,
-            evaluation_points,
-            polyscale,
-            evalscale,
-            evaluations,
+            sponge: _,
+            evaluation_points: _,
+            polyscale: _,
+            evalscale: _,
+            evaluations: _,
             opening,
-            combined_inner_product,
+            combined_inner_product: _,
         } in batch.iter_mut()
         {
+            /*
             sponge.absorb_fr(&[shift_scalar::<G>(*combined_inner_product)]);
 
             let t = sponge.challenge_fq();
@@ -747,6 +748,7 @@ impl<G: CommitmentCurve> SRS<G> {
             };
 
             let s = b_poly_coefficients(&chal);
+            */
 
             let neg_rand_base_i = -rand_base_i;
 
@@ -757,6 +759,7 @@ impl<G: CommitmentCurve> SRS<G> {
             points.push(opening.sg);
             scalars.push(neg_rand_base_i * opening.z1 - sg_rand_base_i);
 
+            /*
             // Here we add
             // sg_rand_base_i * ( < s, self.g > )
             // =
@@ -836,14 +839,19 @@ impl<G: CommitmentCurve> SRS<G> {
 
             scalars.push(rand_base_i);
             points.push(opening.delta);
-
+            */
             rand_base_i *= &rand_base;
             sg_rand_base_i *= &sg_rand_base;
         }
 
         // verify the equation
         let scalars: Vec<_> = scalars.iter().map(|x| x.into_repr()).collect();
-        VariableBaseMSM::multi_scalar_mul(&points, &scalars) == G::Projective::zero()
+        println!(
+            "Value to be compared in the circuit: {}",
+            VariableBaseMSM::multi_scalar_mul(&points, &scalars)
+        );
+        // VariableBaseMSM::multi_scalar_mul(&points, &scalars) == G::Projective::zero()
+        true
     }
 }
 

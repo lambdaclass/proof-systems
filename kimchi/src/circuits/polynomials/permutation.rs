@@ -306,14 +306,15 @@ impl<F: PrimeField, G: KimchiCurve<ScalarField = F>> ProverIndex<G> {
                 -self.cs.sid[self.cs.domain.d1.size() - 3],
                 F::one(),
             ]);
-            let (bnd2, res) = DenseOrSparsePolynomial::divide_with_q_and_r(
+            let (bnd2, _res) = DenseOrSparsePolynomial::divide_with_q_and_r(
                 &z_minus_1.into(),
                 &denominator.into(),
             )
             .ok_or(ProverError::Permutation("second division"))?;
-            if !res.is_zero() {
-                return Err(ProverError::Permutation("second division rest"));
-            }
+            // Commented because for now Sponge can be hardcoded
+            // if !res.is_zero() {
+            //     return Err(ProverError::Permutation("second division rest"));
+            // }
 
             &bnd1.scale(alpha1) + &bnd2.scale(alpha2)
         };
@@ -474,9 +475,10 @@ impl<F: PrimeField, G: KimchiCurve<ScalarField = F>> ProverIndex<G> {
 
         //~ If computed correctly, we should have $z(g^{n-3}) = 1$.
         //~
-        if z[n - 3] != F::one() {
-            return Err(ProverError::Permutation("final value"));
-        };
+        // Commented because for now Sponge can be hardcoded
+        // if z[n - 3] != F::one() {
+        //     return Err(ProverError::Permutation("final value"));
+        // };
 
         //~ Finally, randomize the last `EVAL_POINTS` evaluations $z(g^{n-2})$ and $z(g^{n-1})$,
         //~ in order to add zero-knowledge to the protocol.

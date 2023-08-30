@@ -1,10 +1,19 @@
 use ark_ec::short_weierstrass_jacobian::GroupAffine;
 use mina_curves::pasta::{Fp, Fq, VestaParameters};
-use mina_poseidon::{FqSponge, poseidon::ArithmeticSpongeParams};
+use mina_poseidon::{poseidon::ArithmeticSpongeParams, sponge::ScalarChallenge, FqSponge};
 
-pub struct DummySponge {}
+use crate::{
+    plonk_sponge::FrSponge,
+    proof::{PointEvaluations, ProofEvaluations},
+};
 
-impl FqSponge<Fq, GroupAffine<VestaParameters>, Fp> for DummySponge {
+#[derive(Clone)]
+pub struct DummyFqSponge {}
+
+#[derive(Clone)]
+pub struct DummyFrSponge {}
+
+impl FqSponge<Fq, GroupAffine<VestaParameters>, Fp> for DummyFqSponge {
     fn new(_p: &'static ArithmeticSpongeParams<Fq>) -> Self {
         Self {}
     }
@@ -30,4 +39,24 @@ impl FqSponge<Fq, GroupAffine<VestaParameters>, Fp> for DummySponge {
     fn digest_fq(self) -> Fq {
         Fq::from(1)
     }
+}
+
+impl FrSponge<Fp> for DummyFrSponge {
+    fn new(_p: &'static ArithmeticSpongeParams<Fp>) -> Self {
+        Self {}
+    }
+
+    fn absorb(&mut self, _x: &Fp) {}
+
+    fn absorb_multiple(&mut self, _x: &[Fp]) {}
+
+    fn challenge(&mut self) -> ScalarChallenge<Fp> {
+        ScalarChallenge(Fp::from(1))
+    }
+
+    fn digest(self) -> Fp {
+        Fp::from(1)
+    }
+
+    fn absorb_evaluations(&mut self, _e: &ProofEvaluations<PointEvaluations<Vec<Fp>>>) {}
 }

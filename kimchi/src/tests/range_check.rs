@@ -9,6 +9,7 @@ use crate::{
         },
         wires::Wire,
     },
+    dummy_sponge::{DummyFqSponge, DummyFrSponge},
     proof::ProverProof,
     prover_index::testing::new_index_for_test_with_lookups,
 };
@@ -1218,6 +1219,49 @@ fn verify_range_check_valid_proof1() {
 
     // Verify proof
     let res = verify::<Vesta, BaseSponge, ScalarSponge>(
+        &group_map,
+        &verifier_index,
+        &proof,
+        &public_input,
+    );
+
+    res.unwrap();
+}
+
+#[test]
+fn verify_range_check_valid_proof1_with_dummy_sponge() {
+    // Create prover index
+    let prover_index = create_test_prover_index(0, false);
+
+    // Create witness
+    let witness = range_check::witness::create_multi::<PallasField>(
+        PallasField::from_hex("2bc0afaa2f6f50b1d1424b000000000000000000000000000000000000000000")
+            .unwrap(),
+        PallasField::from_hex("8b30889f3a39e297ac851a000000000000000000000000000000000000000000")
+            .unwrap(),
+        PallasField::from_hex("c1c85ec47635e8edac5600000000000000000000000000000000000000000000")
+            .unwrap(),
+    );
+
+    // Verify computed witness satisfies the circuit
+    prover_index.verify(&witness, &[]).unwrap();
+
+    // Generate proof
+    let group_map = <Vesta as CommitmentCurve>::Map::setup();
+    let public_input = witness[0][0..prover_index.cs.public].to_vec();
+    let proof = ProverProof::create::<DummyFqSponge, DummyFrSponge>(
+        &group_map,
+        witness,
+        &[],
+        &prover_index,
+    )
+    .expect("failed to generate proof");
+
+    // Get the verifier index
+    let verifier_index = prover_index.verifier_index();
+
+    // Verify proof
+    let res = verify::<Vesta, DummyFqSponge, DummyFrSponge>(
         &group_map,
         &verifier_index,
         &proof,
