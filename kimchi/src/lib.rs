@@ -27,5 +27,6 @@ pub mod snarky;
 pub mod verifier;
 pub mod verifier_index;
 
+pub mod dummy_sponge;
 #[cfg(test)]
 mod tests;
