@@ -1255,7 +1255,9 @@ fn verify_range_check_valid_proof1_with_dummy_sponge() {
     )
     .expect("failed to generate proof");
 
-    let srs_json = serde_json::to_string(&prover_index.srs.as_ref()).unwrap();
+    let srs_rmp = std::fs::read("../srs/vesta.srs").unwrap();
+    let srs: SRS<Vesta> = rmp_serde::from_slice(&srs_rmp).unwrap();
+    let srs_json = serde_json::to_string(&srs).unwrap();
     let mut srs_file = File::create("srs.json").unwrap();
     srs_file.write_all(&srs_json.as_bytes()).unwrap();
 
