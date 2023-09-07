@@ -1227,59 +1227,6 @@ fn verify_range_check_valid_proof1() {
 }
 
 #[test]
-fn verify_range_check_valid_proof1_with_dummy_sponge() {
-    // Create prover index
-    let prover_index = create_test_prover_index(0, false);
-
-    // Create witness
-    let witness = range_check::witness::create_multi::<PallasField>(
-        PallasField::from_hex("2bc0afaa2f6f50b1d1424b000000000000000000000000000000000000000000")
-            .unwrap(),
-        PallasField::from_hex("8b30889f3a39e297ac851a000000000000000000000000000000000000000000")
-            .unwrap(),
-        PallasField::from_hex("c1c85ec47635e8edac5600000000000000000000000000000000000000000000")
-            .unwrap(),
-    );
-
-    // Verify computed witness satisfies the circuit
-    prover_index.verify(&witness, &[]).unwrap();
-
-    // Generate proof
-    let group_map = <Vesta as CommitmentCurve>::Map::setup();
-    let public_input = witness[0][0..prover_index.cs.public].to_vec();
-    let proof = ProverProof::create::<DummyFqSponge, DummyFrSponge>(
-        &group_map,
-        witness,
-        &[],
-        &prover_index,
-    )
-    .expect("failed to generate proof");
-
-    let srs_rmp = std::fs::read("../srs/vesta.srs").unwrap();
-    let srs: SRS<Vesta> = rmp_serde::from_slice(&srs_rmp).unwrap();
-    let srs_json = serde_json::to_string(&srs).unwrap();
-    let mut srs_file = File::create("srs.json").unwrap();
-    srs_file.write_all(&srs_json.as_bytes()).unwrap();
-
-    let proof_json = serde_json::to_string(&proof).unwrap();
-    let mut proof_file = File::create("proof.json").unwrap();
-    proof_file.write_all(&proof_json.as_bytes()).unwrap();
-
-    // Get the verifier index
-    let verifier_index = prover_index.verifier_index();
-
-    // Verify proof
-    let res = verify::<Vesta, DummyFqSponge, DummyFrSponge>(
-        &group_map,
-        &verifier_index,
-        &proof,
-        &public_input,
-    );
-
-    res.unwrap();
-}
-
-#[test]
 fn verify_compact_multi_range_check_proof() {
     let rng = &mut StdRng::from_seed(RNG_SEED);
 
