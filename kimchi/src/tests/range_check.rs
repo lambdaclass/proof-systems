@@ -6,7 +6,6 @@ use crate::{
         polynomials::{generic::GenericGateSpec, range_check},
         wires::Wire,
     },
-    dummy_sponge::{DummyFqSponge, DummyFrSponge},
     proof::ProverProof,
     prover_index::testing::new_index_for_test_with_lookups,
 };
@@ -14,7 +13,6 @@ use crate::{
 use ark_ec::AffineCurve;
 use ark_ff::{Field, One, Zero};
 use ark_poly::EvaluationDomain;
-use ark_serialize::Write;
 use mina_curves::pasta::{Fp, Pallas, Vesta, VestaParameters};
 use num_bigint::{BigUint, RandBigInt};
 use o1_utils::{
@@ -26,8 +24,8 @@ use o1_utils::{
 };
 use rand::{rngs::StdRng, SeedableRng};
 
+use std::array;
 use std::sync::Arc;
-use std::{array, fs::File};
 
 use crate::{prover_index::ProverIndex, verifier::verify};
 use groupmap::GroupMap;
@@ -1214,6 +1212,15 @@ fn verify_range_check_valid_proof1() {
 
     // Get the verifier index
     let verifier_index = prover_index.verifier_index();
+
+    let verifier_index_json = serde_json::to_string(&verifier_index).unwrap();
+    std::fs::write("./verifier_index.json", verifier_index_json).unwrap();
+    let proof_json = serde_json::to_string(&proof).unwrap();
+    std::fs::write("./proof.json", proof_json).unwrap();
+    let srs_json = serde_json::to_string(verifier_index.srs().as_ref()).unwrap();
+    std::fs::write("./srs.json", srs_json).unwrap();
+    // println!("group map: {:?}", group_map);
+    println!("input: {:?}", public_input);
 
     // Verify proof
     let res = verify::<Vesta, BaseSponge, ScalarSponge>(
