@@ -1219,7 +1219,7 @@ fn verify_range_check_valid_proof1() {
     std::fs::write("./proof.json", proof_json).unwrap();
     let srs_json = serde_json::to_string(verifier_index.srs().as_ref()).unwrap();
     std::fs::write("./srs.json", srs_json).unwrap();
-    // println!("group map: {:?}", group_map);
+    println!("group map: {:?}", group_map);
     println!("input: {:?}", public_input);
 
     // Verify proof
