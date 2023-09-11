@@ -699,10 +699,8 @@ impl<G: CommitmentCurve> SRS<G> {
         // TODO: This will need adjusting
         let padding = padded_length - nonzero_length;
         let mut points = vec![self.h];
-        println!("H: {}", self.h);
         points.extend(self.g.clone());
         points.extend(vec![G::zero(); padding]);
-        println!("points len: {}", points.len());
 
         let mut scalars = vec![G::ScalarField::zero(); padded_length + 1];
         assert_eq!(scalars.len(), points.len());

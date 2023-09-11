@@ -175,7 +175,6 @@ pub mod testing {
             precomputed_srs::get_srs()
         } else {
             // TODO: we should resume the SRS generation starting from the serialized one
-            println!("GENERATED SRS");
             SRS::<G>::create(cs.domain.d1.size())
         };
 
