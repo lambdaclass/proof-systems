@@ -4,7 +4,7 @@ mod endomul;
 mod endomul_scalar;
 mod foreign_field_add;
 mod foreign_field_mul;
-pub mod framework;
+mod framework;
 mod generic;
 mod lookup;
 mod not;
