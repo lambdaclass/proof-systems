@@ -28,4 +28,4 @@ pub mod verifier;
 pub mod verifier_index;
 
 #[cfg(test)]
-pub mod tests;
+mod tests;
