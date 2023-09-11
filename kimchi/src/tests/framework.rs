@@ -26,7 +26,7 @@ use std::{fmt::Write, mem, time::Instant};
 // aliases
 
 #[derive(Default, Clone)]
-pub(crate) struct TestFramework<G: KimchiCurve> {
+pub struct TestFramework<G: KimchiCurve> {
     gates: Option<Vec<CircuitGate<G::ScalarField>>>,
     witness: Option<[Vec<G::ScalarField>; COLUMNS]>,
     public_inputs: Vec<G::ScalarField>,
@@ -42,7 +42,7 @@ pub(crate) struct TestFramework<G: KimchiCurve> {
 }
 
 #[derive(Clone)]
-pub(crate) struct TestRunner<G: KimchiCurve>(TestFramework<G>);
+pub struct TestRunner<G: KimchiCurve>(TestFramework<G>);
 
 impl<G: KimchiCurve> TestFramework<G>
 where
@@ -50,37 +50,37 @@ where
     G::ScalarField: PrimeField,
 {
     #[must_use]
-    pub(crate) fn gates(mut self, gates: Vec<CircuitGate<G::ScalarField>>) -> Self {
+    pub fn gates(mut self, gates: Vec<CircuitGate<G::ScalarField>>) -> Self {
         self.gates = Some(gates);
         self
     }
 
     #[must_use]
-    pub(crate) fn witness(mut self, witness: [Vec<G::ScalarField>; COLUMNS]) -> Self {
+    pub fn witness(mut self, witness: [Vec<G::ScalarField>; COLUMNS]) -> Self {
         self.witness = Some(witness);
         self
     }
 
     #[must_use]
-    pub(crate) fn public_inputs(mut self, public_inputs: Vec<G::ScalarField>) -> Self {
+    pub fn public_inputs(mut self, public_inputs: Vec<G::ScalarField>) -> Self {
         self.public_inputs = public_inputs;
         self
     }
 
     #[must_use]
-    pub(crate) fn num_prev_challenges(mut self, num_prev_challenges: usize) -> Self {
+    pub fn num_prev_challenges(mut self, num_prev_challenges: usize) -> Self {
         self.num_prev_challenges = num_prev_challenges;
         self
     }
 
     #[must_use]
-    pub(crate) fn lookup_tables(mut self, lookup_tables: Vec<LookupTable<G::ScalarField>>) -> Self {
+    pub fn lookup_tables(mut self, lookup_tables: Vec<LookupTable<G::ScalarField>>) -> Self {
         self.lookup_tables = lookup_tables;
         self
     }
 
     #[must_use]
-    pub(crate) fn runtime_tables_setup(
+    pub fn runtime_tables_setup(
         mut self,
         runtime_tables_setup: Vec<RuntimeTableCfg<G::ScalarField>>,
     ) -> Self {
@@ -89,14 +89,14 @@ where
     }
 
     #[must_use]
-    pub(crate) fn disable_gates_checks(mut self, disable_gates_checks: bool) -> Self {
+    pub fn disable_gates_checks(mut self, disable_gates_checks: bool) -> Self {
         self.disable_gates_checks = disable_gates_checks;
         self
     }
 
     /// creates the indexes
     #[must_use]
-    pub(crate) fn setup(mut self) -> TestRunner<G> {
+    pub fn setup(mut self) -> TestRunner<G> {
         let start = Instant::now();
 
         let lookup_tables = std::mem::take(&mut self.lookup_tables);
@@ -128,33 +128,30 @@ where
     G::BaseField: PrimeField + Clone,
 {
     #[must_use]
-    pub(crate) fn runtime_tables(
-        mut self,
-        runtime_tables: Vec<RuntimeTable<G::ScalarField>>,
-    ) -> Self {
+    pub fn runtime_tables(mut self, runtime_tables: Vec<RuntimeTable<G::ScalarField>>) -> Self {
         self.0.runtime_tables = runtime_tables;
         self
     }
 
     #[must_use]
-    pub(crate) fn recursion(mut self, recursion: Vec<RecursionChallenge<G>>) -> Self {
+    pub fn recursion(mut self, recursion: Vec<RecursionChallenge<G>>) -> Self {
         self.0.recursion = recursion;
         self
     }
 
     #[must_use]
-    pub(crate) fn witness(mut self, witness: [Vec<G::ScalarField>; COLUMNS]) -> Self {
+    pub fn witness(mut self, witness: [Vec<G::ScalarField>; COLUMNS]) -> Self {
         self.0.witness = Some(witness);
         self
     }
 
-    pub(crate) fn prover_index(&self) -> &ProverIndex<G> {
+    pub fn prover_index(&self) -> &ProverIndex<G> {
         self.0.prover_index.as_ref().unwrap()
     }
 
     /// Create a proof. This helper can be used when we want to test the prover
     /// raises an exception
-    pub(crate) fn prove<EFqSponge, EFrSponge>(self) -> Result<(), String>
+    pub fn prove<EFqSponge, EFrSponge>(self) -> Result<(), String>
     where
         EFqSponge: Clone + FqSponge<G::BaseField, G, G::ScalarField>,
         EFrSponge: FrSponge<G::ScalarField>,
@@ -185,7 +182,7 @@ where
     }
 
     /// Create and verify a proof
-    pub(crate) fn prove_and_verify<EFqSponge, EFrSponge>(self) -> Result<(), String>
+    pub fn prove_and_verify<EFqSponge, EFrSponge>(self) -> Result<(), String>
     where
         EFqSponge: Clone + FqSponge<G::BaseField, G, G::ScalarField>,
         EFrSponge: FrSponge<G::ScalarField>,
