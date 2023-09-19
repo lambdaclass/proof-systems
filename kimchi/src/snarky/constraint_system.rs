@@ -427,8 +427,8 @@ impl<Field: PrimeField> SnarkyConstraintSystem<Field> {
 
     pub fn add_rows_using_gates(&mut self, gates: &[CircuitGate<Field>]) {
         for gate in gates {
-            // TODO: comput vars
-            let var = Some(V::Internal(InternalVar(0)));
+            // TODO: compute vars
+            let var = Some(V::External(0));
             self.add_row(vec![var], gate.typ, gate.coeffs.clone());
         }
     }
