@@ -425,6 +425,14 @@ impl<Field: PrimeField> SnarkyConstraintSystem<Field> {
         self.rows.push(vars);
     }
 
+    pub fn add_rows_using_gates(&mut self, gates: &[CircuitGate<Field>]) {
+        for gate in gates {
+            // TODO: comput vars
+            let var = Some(V::Internal(InternalVar(0)));
+            self.add_row(vec![var], gate.typ, gate.coeffs.clone());
+        }
+    }
+
     /// Fill the `gate` values(input and output), and finalize the `circuit`.
     ///
     /// # Panics
