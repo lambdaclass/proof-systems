@@ -1333,3 +1333,52 @@ enum ConstantOrVar {
     Constant,
     Var(V),
 }
+
+#[cfg(test)]
+mod tests {
+    use ark_ec::short_weierstrass_jacobian::GroupAffine;
+    use mina_curves::pasta::VestaParameters;
+
+    use crate::snarky::{
+        constants::Constants,
+        constraint_system::{Position, Row},
+    };
+
+    use super::{SnarkyConstraintSystem, V};
+
+    #[test]
+    fn wire_gates() {
+        const PUBLIC_INPUT_SIZE: usize = 0;
+        let constants = Constants::new::<GroupAffine<VestaParameters>>();
+        let mut cs = SnarkyConstraintSystem::create(constants);
+        cs.set_public_input_size(PUBLIC_INPUT_SIZE);
+
+        cs.wire(V::External(0), 0, 0);
+        cs.wire(V::External(1), 0, 1);
+        cs.wire(V::External(0), 0, 2);
+
+        let pos_map = cs.equivalence_classes_to_hashtbl();
+        let pos_0_0 = pos_map
+            .get(&Position {
+                row: Row::AfterPublicInput(0),
+                col: 0,
+            })
+            .unwrap();
+        let pos_0_2 = pos_map
+            .get(&Position {
+                row: Row::AfterPublicInput(0),
+                col: 2,
+            })
+            .unwrap();
+        println!(
+            "map(0, 0): {} {}",
+            pos_0_0.row.to_absolute(PUBLIC_INPUT_SIZE),
+            pos_0_0.col
+        );
+        println!(
+            "map(0, 2): {} {}",
+            pos_0_2.row.to_absolute(PUBLIC_INPUT_SIZE),
+            pos_0_2.col
+        );
+    }
+}
