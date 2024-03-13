@@ -23,6 +23,7 @@
 use crate::circuits::{argument::ArgumentType, gate::GateType};
 use ark_ff::Field;
 use serde::{Deserialize, Serialize};
+use serde_with::serde_as;
 use std::{
     collections::HashMap,
     fmt::Display,
@@ -38,8 +39,9 @@ use std::{
 /// See [Self::default] to create one,
 /// and [Self::register] to register a new mapping.
 /// Once you know the alpha value, you can convert this type to a [Alphas].
+#[serde_as]
 #[derive(Debug, Default, Serialize, Deserialize, Clone)]
-pub struct Alphas<F> {
+pub struct Alphas<F: Field> {
     /// The next power of alpha to use
     /// the end result will be [1, alpha^{next_power - 1}]
     next_power: u32,
@@ -166,7 +168,7 @@ impl<F: Field> Alphas<F> {
     }
 }
 
-impl<T> Display for Alphas<T> {
+impl<F: Field> Display for Alphas<F> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for arg in [
             ArgumentType::Gate(GateType::Zero),
