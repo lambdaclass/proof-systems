@@ -1858,7 +1858,7 @@ pub struct VerifierIndex<G: KimchiCurve, OpeningProof: OpenProof<G>> {
     #[serde(skip)]
     pub linearization: Linearization<Vec<PolishToken<G::ScalarField>>>,
     /// The mapping between powers of alpha and constraints
-    // #[serde(skip)]
+    #[serde(skip)]
     // #[serde_as(as = "o1_utils::serialization::SerdeAs")]
     pub powers_of_alpha: Alphas<G::ScalarField>,
 }
