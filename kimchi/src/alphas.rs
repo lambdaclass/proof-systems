@@ -49,6 +49,7 @@ pub struct Alphas<F: Field> {
     mapping: HashMap<ArgumentType, (u32, u32)>,
     /// The powers of alpha: 1, alpha, alpha^2, etc.
     /// If set to [Some], you can't register new constraints.
+    #[serde_as(as = "o1_utils::serialization::SerdeAs")]
     alphas: Option<Vec<F>>,
 }
 
