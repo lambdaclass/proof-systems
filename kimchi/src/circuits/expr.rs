@@ -1840,7 +1840,7 @@ impl<F: FftField> Expr<F> {
     }
 }
 
-#[serde_as]
+// #[serde_as]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 /// A "linearization", which is linear combination with `E` coefficients of
 /// columns.
