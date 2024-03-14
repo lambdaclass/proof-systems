@@ -17,10 +17,12 @@ use ark_ff::{FftField, Field, One, PrimeField, Zero};
 use ark_poly::{
     univariate::DensePolynomial, EvaluationDomain, Evaluations, Radix2EvaluationDomain as D,
 };
+use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use itertools::Itertools;
 use o1_utils::{foreign_field::ForeignFieldHelpers, FieldHelpers};
 use rayon::prelude::*;
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde_with::serde_as;
 use std::ops::{Add, AddAssign, Mul, Neg, Sub};
 use std::{
     cmp::Ordering,
@@ -275,11 +277,13 @@ pub enum ChallengeTerm {
 /// semantic in the expression framework.
 /// TODO: we should generalize the expression type over challenges and constants.
 /// See <https://github.com/MinaProtocol/mina/issues/15287>
+#[serde_as]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(bound = "F: CanonicalDeserialize + CanonicalSerialize")]
 pub enum ConstantTerm<F> {
     EndoCoefficient,
     Mds { row: usize, col: usize },
-    Literal(F),
+    Literal(#[serde_as(as = "o1_utils::serialization::SerdeAs")] F),
 }
 
 pub trait Literal: Sized {
@@ -862,7 +866,7 @@ where
 /// expressions, which are vectors of the below tokens.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PolishToken<F, Column> {
-    Constant(ConstantTerm<F>),
+    Constant(#[serde(bound = "ConstantTerm<F>: Serialize + DeserializeOwned")] ConstantTerm<F>),
     Challenge(ChallengeTerm),
     Cell(Variable<Column>),
     Dup,
@@ -2116,6 +2120,7 @@ impl<F: FftField, Column: Copy + GenericColumn> Expr<F, Column> {
     }
 }
 
+#[serde_as]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 /// A "linearization", which is linear combination with `E` coefficients of
 /// columns.

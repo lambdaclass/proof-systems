@@ -1861,7 +1861,7 @@ pub struct VerifierIndex<G: KimchiCurve, OpeningProof: OpenProof<G>> {
     #[serde(bound = "PolyComm<G>: Serialize + DeserializeOwned")]
     pub lookup_index: Option<LookupVerifierIndex<G>>,
 
-    #[serde(skip)]
+    // #[serde(skip)]
     pub linearization: Linearization<Vec<PolishToken<G::ScalarField, Column>>, Column>,
     /// The mapping between powers of alpha and constraints
     // #[serde(skip)]
