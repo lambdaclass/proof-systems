@@ -738,7 +738,7 @@ where
     Ok(())
 }
 
-fn to_batch<'a, G, EFqSponge, EFrSponge, OpeningProof: OpenProof<G>>(
+pub fn to_batch<'a, G, EFqSponge, EFrSponge, OpeningProof: OpenProof<G>>(
     verifier_index: &VerifierIndex<G, OpeningProof>,
     proof: &'a ProverProof<G, OpeningProof>,
     public_input: &'a [<G as AffineCurve>::ScalarField],
