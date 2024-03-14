@@ -2120,7 +2120,7 @@ impl<F: FftField, Column: Copy + GenericColumn> Expr<F, Column> {
     }
 }
 
-#[serde_as]
+// #[serde_as]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 /// A "linearization", which is linear combination with `E` coefficients of
 /// columns.
