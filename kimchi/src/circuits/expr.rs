@@ -16,10 +16,12 @@ use ark_ff::{FftField, Field, One, PrimeField, Zero};
 use ark_poly::{
     univariate::DensePolynomial, EvaluationDomain, Evaluations, Radix2EvaluationDomain as D,
 };
+use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use itertools::Itertools;
 use o1_utils::{foreign_field::ForeignFieldHelpers, FieldHelpers};
 use rayon::prelude::*;
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde_with::serde_as;
 use std::ops::{Add, AddAssign, Mul, Neg, Sub};
 use std::{
     collections::{HashMap, HashSet},
@@ -1838,6 +1840,7 @@ impl<F: FftField> Expr<F> {
     }
 }
 
+#[serde_as]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 /// A "linearization", which is linear combination with `E` coefficients of
 /// columns.
