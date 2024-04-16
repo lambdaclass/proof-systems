@@ -147,6 +147,9 @@ where
         //~ 1. Absorb the commitment of the public input polynomial with the Fq-Sponge.
         absorb_commitment(&mut fq_sponge, public_comm);
 
+        //~ 1. (NEW) Absorb the public input (TODO: remove unwrap).
+        fq_sponge.absorb_fr(public_input.unwrap());
+
         //~ 1. Absorb the commitments to the registers / witness columns with the Fq-Sponge.
         self.commitments
             .w_comm
