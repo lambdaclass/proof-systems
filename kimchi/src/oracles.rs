@@ -42,7 +42,8 @@ pub mod caml {
 
     use crate::{
         circuits::scalars::caml::CamlRandomOracles, curve::KimchiCurve, error::VerifyError,
-        plonk_sponge::FrSponge, proof::ProverProof, verifier_index::VerifierIndex,
+        plonk_sponge::FrSponge, proof::ProverProof, public_input::hash_public_input,
+        verifier_index::VerifierIndex,
     };
 
     use super::*;

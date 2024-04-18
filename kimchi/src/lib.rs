@@ -25,6 +25,7 @@ pub mod precomputed_srs;
 pub mod proof;
 pub mod prover;
 pub mod prover_index;
+pub mod public_input;
 pub mod snarky;
 pub mod verifier;
 pub mod verifier_index;

@@ -31,6 +31,7 @@ use crate::{
         RecursionChallenge,
     },
     prover_index::ProverIndex,
+    public_input::hash_public_input,
     verifier_index::VerifierIndex,
 };
 use ark_ff::{FftField, Field, One, PrimeField, UniformRand, Zero};
@@ -253,6 +254,8 @@ where
         //~    the polynomial that evaluates to $-p_i$ for the first `public_input_size` values of the domain,
         //~    and $0$ for the rest.
         let public = witness[0][0..index.cs.public].to_vec();
+        let public_input_hash = hash_public_input::<G, EFqSponge>(&public);
+        let public_input_hash_vec = vec![public_input_hash];
         let public_poly = -Evaluations::<G::ScalarField, D<G::ScalarField>>::from_vec_and_domain(
             public.clone(),
             index.cs.domain.d1,
@@ -280,7 +283,7 @@ where
         absorb_commitment(&mut fq_sponge, &public_comm);
 
         //~ 1. (NEW) Absorb the public input.
-        fq_sponge.absorb_fr(&public);
+        fq_sponge.absorb_fr(&public_input_hash_vec);
 
         //~ 1. Commit to the witness columns by creating `COLUMNS` hidding commitments.
         //~
