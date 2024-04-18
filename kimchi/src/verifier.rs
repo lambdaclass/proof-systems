@@ -16,6 +16,7 @@ use crate::{
     oracles::OraclesResult,
     plonk_sponge::FrSponge,
     proof::{PointEvaluations, ProofEvaluations, ProverProof, RecursionChallenge},
+    public_input::hash_public_input,
     verifier_index::VerifierIndex,
 };
 use ark_ec::AffineCurve;
@@ -146,6 +147,9 @@ where
 
         //~ 1. Absorb the commitment of the public input polynomial with the Fq-Sponge.
         absorb_commitment(&mut fq_sponge, public_comm);
+
+        //~ 1. (NEW) Absorb the public input (TODO: remove unwrap).
+        fq_sponge.absorb_fr(public_input.unwrap());
 
         //~ 1. Absorb the commitments to the registers / witness columns with the Fq-Sponge.
         self.commitments
@@ -765,11 +769,6 @@ where
             proof.prev_challenges.len(),
         ));
     }
-    if public_input.len() != verifier_index.public {
-        return Err(VerifyError::IncorrectPubicInputLength(
-            verifier_index.public,
-        ));
-    }
 
     //~ 1. Check the length of evaluations inside the proof.
     let chunk_size = {
@@ -782,18 +781,16 @@ where
     };
     check_proof_evals_len(proof, chunk_size)?;
 
+    let public_input_hash = hash_public_input::<G, EFqSponge>(public_input);
+    let public_input_hash_vec = vec![public_input_hash];
+
     //~ 1. Commit to the negated public input polynomial.
     let public_comm = {
-        if public_input.len() != verifier_index.public {
-            return Err(VerifyError::IncorrectPubicInputLength(
-                verifier_index.public,
-            ));
-        }
         let lgr_comm = verifier_index
             .srs()
             .get_lagrange_basis(verifier_index.domain.size())
             .expect("pre-computed committed lagrange bases not found");
-        let com: Vec<_> = lgr_comm.iter().take(verifier_index.public).collect();
+        let com: Vec<_> = lgr_comm.iter().take(public_input.len()).collect();
         if public_input.is_empty() {
             PolyComm::new(
                 vec![verifier_index.srs().blinding_commitment(); chunk_size],
@@ -825,7 +822,11 @@ where
         ft_eval0,
         combined_inner_product,
         ..
-    } = proof.oracles::<EFqSponge, EFrSponge>(verifier_index, &public_comm, Some(public_input))?;
+    } = proof.oracles::<EFqSponge, EFrSponge>(
+        verifier_index,
+        &public_comm,
+        Some(&public_input_hash_vec),
+    )?;
 
     //~ 1. Combine the chunked polynomials' evaluations
     //~    (TODO: most likely only the quotient polynomial is chunked)
@@ -835,7 +836,7 @@ where
     let context = Context {
         verifier_index,
         proof,
-        public_input,
+        public_input: &public_input_hash_vec,
     };
 
     //~ 1. Compute the commitment to the linearized polynomial $f$.
