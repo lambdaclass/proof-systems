@@ -60,7 +60,7 @@ where
         S: serde::Serializer,
     {
         let mut bytes = vec![];
-        val.serialize(&mut bytes)
+        val.serialize_unchecked(&mut bytes)
             .map_err(serde::ser::Error::custom)?;
 
         if serializer.is_human_readable() {
@@ -84,6 +84,6 @@ where
         } else {
             Bytes::deserialize_as(deserializer)?
         };
-        T::deserialize(&mut &bytes[..]).map_err(serde::de::Error::custom)
+        T::deserialize_unchecked(&mut &bytes[..]).map_err(serde::de::Error::custom)
     }
 }
