@@ -151,6 +151,10 @@ impl<H: 'static + Hashable> Schnorr<H> {
         // Squeeze and convert from base field element to scalar field element
         // Since the difference in modulus between the two fields is < 2^125, w.h.p., a
         // random value from one field will fit in the other field.
-        ScalarField::from(self.hasher.init_and_hash(&schnorr_input).into_bigint())
+        ScalarField::from(
+            self.hasher
+                .init_and_hash(self.domain_param, &schnorr_input)
+                .into_bigint(),
+        )
     }
 }
