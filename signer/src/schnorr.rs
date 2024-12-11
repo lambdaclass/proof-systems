@@ -153,7 +153,7 @@ impl<H: 'static + Hashable> Schnorr<H> {
         // random value from one field will fit in the other field.
         ScalarField::from(
             self.hasher
-                .init_and_hash(self.domain_param, &schnorr_input)
+                .init_and_hash(self.domain_param.clone(), &schnorr_input)
                 .into_bigint(),
         )
     }
